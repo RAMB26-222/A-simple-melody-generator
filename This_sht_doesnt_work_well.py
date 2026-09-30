@@ -1,10 +1,16 @@
+from IPython.display import Audio
+import numpy as np
+import sounddevice as sd
+from pathlib import Path
+
 ### НА ВВОД ТЕКСТОВЫЙ ФАИЛ НА ПЕРВОЙ СТРОЧКЕ БПМ И РАЗМЕР ЧЕРЕЗ ПРОБЕЛЫ (ДАЖЕ РАЗМЕР (4/4 БУДЕТ 4 : 4))
 ### В ОСТАЛЬНЫХ ПОСТРОЧНО ДАННЫЕ О НОТЕ ФОРМАТА >АНГЛ_НАЗВАНИЕ_БУКВОЙ ОКТАВА_ЦИФРОЙ ДЛИТЕЛЬНОСТЬ_ТИПО_КАКАЯ<
 #  (> A 4 4< ГДЕ 4 ЭТО ЧЕТВЕРТАЯ, 8 ВОСЬМАЯ ИТД)
+Herz = []
+Ms = []
 temp=0
 raz=0
 tabl={"A":9,"A#":10,"B":11,'C':0, "C#":1, "D":2,"D#":3,"E":4,"F":5,"F#":6,"G":7,"G#":8}
-from pathlib import Path
 def long (razmernoti, bpm, delitel):
     dln=(((60*delitel)/bpm)/razmernoti)*1000
     return dln
@@ -33,7 +39,25 @@ if file_path.exists():
                 b=long(dlit,temp,raz)
                 b=round(b)
                 print(a,b)
+                Herz.append(a)
+                Ms.append(b/1000)
                 #ВЫВОДИТ ЧАСТОТУ И ДЛИТЕЛЬНОСТЬ В !!!!!!МИЛИСЕК!!!!!!!
 else:
     print(f"Ошибка! Файл не найден по пути: {file_path}")
 ### |3===============D ###
+
+Signal = []
+for i in range(len(Herz)):
+    f = Herz[i]
+    t = Ms[i]
+    Time = np.linspace(0, t, int(fs*t))
+    signal = [np.sin(2*np.pi*f*j) for j in Time]
+    Signal += signal
+
+sig = np.asarray(Signal, dtype=np.float32)
+print(sig)
+# Играем
+#sd.play(sig, fs)
+#sd.wait()  # ждём окончания
+
+Audio(sig, rate=fs)
