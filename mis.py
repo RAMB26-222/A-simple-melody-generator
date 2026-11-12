@@ -24,7 +24,7 @@ tabl = {
     'C': 0, 'C#': 1, 'D': 2,
     'D#': 3, 'E': 4, 'F': 5,
     'F#': 6, 'G': 7, 'G#': 8,
-    'РЎ': 0
+    'РЎ': 0, 'B#': 0
 }
 
 # ------------------------------------------------------
@@ -32,9 +32,12 @@ def durat (razmernoti, bpm, delitel):
     dln=(((60*delitel)/bpm)/razmernoti)*1000
     return dln
 # ------------------------------------------------------
-def hz (vnutri, snaruzi):
-    i= snaruzi*12 + tabl[vnutri]
-    gerz=440*(2**((i-57)/12))
+def hz (nota, ovtava):
+    if nota == 'O':
+        gerz = 0
+    else:
+        i= octava*12 + tabl[nota]
+        gerz=440*(2**((i-57)/12))
     return gerz
 # ------------------------------------------------------
 
