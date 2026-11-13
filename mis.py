@@ -24,7 +24,7 @@ tabl = {
     'C': 0, 'C#': 1, 'D': 2,
     'D#': 3, 'E': 4, 'F': 5,
     'F#': 6, 'G': 7, 'G#': 8,
-    'РЎ': 0
+    'РЎ': 0, 'B#': 0
 }
 
 # ------------------------------------------------------
@@ -32,9 +32,12 @@ def durat (razmernoti, bpm, delitel):
     dln=(((60*delitel)/bpm)/razmernoti)*1000
     return dln
 # ------------------------------------------------------
-def hz (vnutri, snaruzi):
-    i= snaruzi*12 + tabl[vnutri]
-    gerz=440*(2**((i-57)/12))
+def hz (nota, ovtava):
+    if nota == 'O':
+        gerz = 0
+    else:
+        i= octava*12 + tabl[nota]
+        gerz=440*(2**((i-57)/12))
     return gerz
 # ------------------------------------------------------
 
@@ -61,7 +64,8 @@ def low_pass_filter(x, cutoff_hz, sample_rate):
 # --- 1. Выбор режима ---
 mode_0 = 1
 if mode_0 == 1:
-    file = open(str(input('file\'s name, pls\n--->')))
+    name = str(input('file\'s name, pls\n--->'))
+    file = open(name)
     temp, raz = map(int, file.readline().rstrip('\n')[:-2].split())
     sound_smth = []
     for line in file:
@@ -189,7 +193,7 @@ def create_melody(melody_score, sample_rate=SAMPLE_RATE):
             freq = note_name
         else:
             duration = beats * BEAT_DURATION
-            freq = NOTES.get(note_name, 0)
+            freq = tabl.get(note_name, 0)
 
         note_wave = generate_note(freq, duration, sample_rate)
         full_track = np.concatenate((full_track, note_wave))
@@ -216,7 +220,7 @@ if __name__ == "__main__":
 
     # Сохранение в WAV-файл (формат 16-бит PCM)
     audio_int16 = (audio_data * 32767).astype(np.int16)
-    output_filename = "melody.wav"
+    output_filename = f"{name}.wav"
     wavfile.write(output_filename, SAMPLE_RATE, audio_int16)
     print(f"Мелодия сохранена в файл: {output_filename}")
     print("Строим график осциллограммы...")
@@ -240,7 +244,7 @@ if __name__ == "__main__":
     plt.title("Фрагмент волны")
 
     plt.tight_layout()
-    plt.savefig("waveform.png", dpi=300)
+    plt.savefig(f"{name}.png", dpi=300)
     plt.show()
     print("График сохранен в файл: waveform.png")
     
